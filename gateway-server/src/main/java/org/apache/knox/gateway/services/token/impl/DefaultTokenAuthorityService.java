@@ -220,7 +220,7 @@ public class DefaultTokenAuthorityService implements JWTokenAuthority, Service {
       throw new TokenServiceException("Cannot verify token.", e);
     }
   }
-  
+
   @Override
   public boolean verifyToken(JWT token, String jwksurl, String algorithm, Set<JOSEObjectType> allowedJwsTypes) throws TokenServiceException {
     boolean verified = false;
