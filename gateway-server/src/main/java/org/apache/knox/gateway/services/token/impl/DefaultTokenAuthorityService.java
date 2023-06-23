@@ -220,13 +220,15 @@ public class DefaultTokenAuthorityService implements JWTokenAuthority, Service {
     }
   }
 
+  private final Map<String, JWKSource<SecurityContext>> jwkSourceCache = new HashMap<String, JWKSource<SecurityContext>>();
+  
   @Override
   public boolean verifyToken(JWT token, String jwksurl, String algorithm, Set<JOSEObjectType> allowedJwsTypes) throws TokenServiceException {
     boolean verified = false;
     try {
       if (algorithm != null && jwksurl != null) {
         JWSAlgorithm expectedJWSAlg = JWSAlgorithm.parse(algorithm);
-        JWKSource<SecurityContext> keySource = new RemoteJWKSet<>(new URL(jwksurl));
+        JWKSource<SecurityContext> keySource = jwkSourceCache.computeIfAbsent(jwksurl, k -> new RemoteJWKSet<>(new URL(k)));
         JWSKeySelector<SecurityContext> keySelector = new JWSVerificationKeySelector<>(expectedJWSAlg, keySource);
 
         // Create a JWT processor for the access tokens
