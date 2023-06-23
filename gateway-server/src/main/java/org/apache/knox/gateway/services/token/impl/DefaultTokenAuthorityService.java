@@ -92,6 +92,7 @@ public class DefaultTokenAuthorityService implements JWTokenAuthority, Service {
   private RSAPrivateKey signingKey;
 
   private Optional<String> cachedSigningKeyID = Optional.empty();
+  private final Map<String, JWKSource<SecurityContext>> jwkSourceCache = new HashMap<String, JWKSource<SecurityContext>>();
 
   public void setKeystoreService(KeystoreService ks) {
     this.keystoreService = ks;
@@ -219,8 +220,6 @@ public class DefaultTokenAuthorityService implements JWTokenAuthority, Service {
       throw new TokenServiceException("Cannot verify token.", e);
     }
   }
-
-  private final Map<String, JWKSource<SecurityContext>> jwkSourceCache = new HashMap<String, JWKSource<SecurityContext>>();
   
   @Override
   public boolean verifyToken(JWT token, String jwksurl, String algorithm, Set<JOSEObjectType> allowedJwsTypes) throws TokenServiceException {
