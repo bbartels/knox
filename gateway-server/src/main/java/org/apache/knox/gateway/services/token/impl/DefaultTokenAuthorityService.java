@@ -92,6 +92,7 @@ public class DefaultTokenAuthorityService implements JWTokenAuthority, Service {
   private RSAPrivateKey signingKey;
 
   private Optional<String> cachedSigningKeyID = Optional.empty();
+  private final Map<String, JWKSource<SecurityContext>> jwkSourceCache = new HashMap<String, JWKSource<SecurityContext>>();
 
   public void setKeystoreService(KeystoreService ks) {
     this.keystoreService = ks;
@@ -226,7 +227,7 @@ public class DefaultTokenAuthorityService implements JWTokenAuthority, Service {
     try {
       if (algorithm != null && jwksurl != null) {
         JWSAlgorithm expectedJWSAlg = JWSAlgorithm.parse(algorithm);
-        JWKSource<SecurityContext> keySource = new RemoteJWKSet<>(new URL(jwksurl));
+        JWKSource<SecurityContext> keySource = jwkSourceCache.computeIfAbsent(jwksurl, k -> new RemoteJWKSet<>(new URL(k)));
         JWSKeySelector<SecurityContext> keySelector = new JWSVerificationKeySelector<>(expectedJWSAlg, keySource);
 
         // Create a JWT processor for the access tokens
